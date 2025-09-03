@@ -1,4 +1,4 @@
-import { Calendar, User2, BarChart3, CheckSquare } from "lucide-react";
+import { Calendar, BarChart3, CheckSquare } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
