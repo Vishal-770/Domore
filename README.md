@@ -8,7 +8,7 @@ A modern, feature-rich task management application built with Next.js 15, TypeSc
 )![Domore Analytics](/demoimage3.png
 )
 ## ✨ Features
-
+**LiveDemo** - https://domore-omega.vercel.app/
 ### 🎯 Core Task Management
 - **Create & Edit Tasks** - Simple task creation with rich descriptions
 - **Priority System** - Three-tier priority levels (High, Medium, Low) with color coding
