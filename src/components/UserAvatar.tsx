@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { signOut } from "@/actions/auth";
 
 interface UserAvatarProps {
   user: {
@@ -54,7 +55,7 @@ export function UserAvatar({ user }: UserAvatarProps) {
 
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <form action="/api/auth/logout" method="post" className="w-full">
+          <form action={signOut} className="w-full">
             <button type="submit" className="flex w-full items-center">
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>

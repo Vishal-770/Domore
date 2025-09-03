@@ -5,11 +5,11 @@ import { createClient } from "@/utils/supabase/server";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  // if "next" is in param, use it as the redirect URL
-  let next = searchParams.get("next") ?? "/";
+  // if "next" is in param, use it as the redirect URL, default to dashboard
+  let next = searchParams.get("next") ?? "/dashboard";
   if (!next.startsWith("/")) {
     // if "next" is not a relative URL, use the default
-    next = "/";
+    next = "/dashboard";
   }
 
   if (code) {
