@@ -16,28 +16,14 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart";
+import { PieChart, Pie, Cell } from "recharts";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  PieChart,
-  Pie,
-  Cell,
-  AreaChart,
-  Area,
-} from "recharts";
-import {
-  TrendingUp,
   Target,
-  Calendar,
   AlertCircle,
   CheckCircle2,
   Clock,
   Zap,
   Award,
-  Loader2,
 } from "lucide-react";
 import {
   format,
@@ -166,12 +152,44 @@ const AnalyticsPage = () => {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-            <p className="mt-2 text-muted-foreground">Loading analytics...</p>
+      <div className="container mx-auto px-4 py-8 space-y-8">
+        {/* Header Skeleton */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="h-8 w-64 bg-muted rounded mb-2" />
+            <div className="h-4 w-80 bg-muted rounded" />
           </div>
+        </div>
+
+        {/* Key Metrics Skeleton */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <div className="h-4 w-16 bg-muted rounded" />
+                <div className="h-4 w-4 bg-muted rounded" />
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 w-12 bg-muted rounded mb-1" />
+                <div className="h-3 w-16 bg-muted rounded" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Charts Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <div className="h-6 w-48 bg-muted rounded mb-2" />
+                <div className="h-4 w-64 bg-muted rounded" />
+              </CardHeader>
+              <CardContent>
+                <div className="h-80 w-full bg-muted rounded" />
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     );
@@ -242,21 +260,13 @@ const AnalyticsPage = () => {
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">
-            Analytics Dashboard
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Track your productivity and task management insights
-          </p>
-        </div>
-        <Button
-          variant="outline"
-          onClick={() => (window.location.href = "/dashboard")}
-        >
-          Back to Dashboard
-        </Button>
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">
+          Analytics Dashboard
+        </h1>
+        <p className="text-muted-foreground mt-1">
+          Track your productivity and task management insights
+        </p>
       </div>
 
       {/* Key Metrics */}
@@ -384,80 +394,6 @@ const AnalyticsPage = () => {
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <ChartLegend content={<ChartLegendContent />} />
               </PieChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Charts Row 2 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Weekly Completion Trend */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-blue-500" />
-              Weekly Completion Trend
-            </CardTitle>
-            <CardDescription>Tasks completed this week</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={chartConfig} className="h-[300px]">
-              <BarChart data={analytics.charts.weekly}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <ChartTooltip
-                  content={<ChartTooltipContent />}
-                  labelFormatter={(value, payload) =>
-                    payload?.[0]?.payload?.day || value
-                  }
-                />
-                <Bar dataKey="completed" fill="#10b981" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-
-        {/* Monthly Trend */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-purple-500" />
-              30-Day Activity Trend
-            </CardTitle>
-            <CardDescription>
-              Task creation vs completion over time
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={chartConfig} className="h-[300px]">
-              <AreaChart data={analytics.charts.monthly}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 12 }}
-                  interval="preserveStartEnd"
-                />
-                <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Area
-                  type="monotone"
-                  dataKey="created"
-                  stackId="1"
-                  stroke="#3b82f6"
-                  fill="#3b82f6"
-                  fillOpacity={0.6}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="completed"
-                  stackId="2"
-                  stroke="#10b981"
-                  fill="#10b981"
-                  fillOpacity={0.8}
-                />
-                <ChartLegend content={<ChartLegendContent />} />
-              </AreaChart>
             </ChartContainer>
           </CardContent>
         </Card>

@@ -4,13 +4,17 @@ import { useTasks } from "@/hooks/useTasks";
 import { Task } from "@/services/taskService";
 import { TaskCard } from "@/components/TaskCard";
 import { TaskFormNew } from "@/components/TaskFormNew";
-import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { DashboardSkeleton } from "@/components/Skeletons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -18,23 +22,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
-  Plus, 
-  CheckCircle, 
-  Clock, 
-  AlertCircle, 
+import {
+  Plus,
+  CheckCircle,
+  Clock,
+  AlertCircle,
   Search,
   CalendarIcon,
   Filter,
   SortAsc,
-  Loader2,
   CheckCircle2,
-  Circle
+  Circle,
 } from "lucide-react";
 import { format, isToday, isThisWeek, startOfDay, endOfDay } from "date-fns";
 import { cn } from "@/lib/utils";
 
-type FilterType = "all" | "pending" | "completed" | "overdue" | "today" | "week";
+type FilterType =
+  | "all"
+  | "pending"
+  | "completed"
+  | "overdue"
+  | "today"
+  | "week";
 type SortType = "created" | "priority" | "due_date" | "title";
 
 const DashboardPage = () => {
@@ -45,15 +54,16 @@ const DashboardPage = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [taskToComplete, setTaskToComplete] = useState<Task | null>(null);
 
   const filteredAndSortedTasks = useMemo(() => {
-    const filtered = tasks.filter(task => {
+    const filtered = tasks.filter((task) => {
       // Search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
-        if (!task.title.toLowerCase().includes(query) && 
-            !task.description?.toLowerCase().includes(query)) {
+        if (
+          !task.title.toLowerCase().includes(query) &&
+          !task.description?.toLowerCase().includes(query)
+        ) {
           return false;
         }
       }
@@ -64,8 +74,7 @@ const DashboardPage = () => {
         const taskDate = new Date(task.due_date);
         const filterDate = selectedDate;
         return (
-          taskDate >= startOfDay(filterDate) && 
-          taskDate <= endOfDay(filterDate)
+          taskDate >= startOfDay(filterDate) && taskDate <= endOfDay(filterDate)
         );
       }
 
@@ -76,7 +85,11 @@ const DashboardPage = () => {
         case "completed":
           return task.is_complete;
         case "overdue":
-          return !task.is_complete && task.due_date && new Date(task.due_date) < new Date();
+          return (
+            !task.is_complete &&
+            task.due_date &&
+            new Date(task.due_date) < new Date()
+          );
         case "today":
           return task.due_date && isToday(new Date(task.due_date));
         case "week":
@@ -97,12 +110,16 @@ const DashboardPage = () => {
           if (!a.due_date && !b.due_date) return 0;
           if (!a.due_date) return 1;
           if (!b.due_date) return -1;
-          return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+          return (
+            new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+          );
         case "title":
           return a.title.localeCompare(b.title);
         case "created":
         default:
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
       }
     });
 
@@ -110,13 +127,13 @@ const DashboardPage = () => {
   }, [tasks, searchQuery, filter, sortBy, selectedDate]);
 
   const stats = useMemo(() => {
-    const completedTasks = tasks.filter(task => task.is_complete);
-    const pendingTasks = tasks.filter(task => !task.is_complete);
-    const overdueTasks = pendingTasks.filter(task => 
-      task.due_date && new Date(task.due_date) < new Date()
+    const completedTasks = tasks.filter((task) => task.is_complete);
+    const pendingTasks = tasks.filter((task) => !task.is_complete);
+    const overdueTasks = pendingTasks.filter(
+      (task) => task.due_date && new Date(task.due_date) < new Date()
     );
-    const todayTasks = tasks.filter(task => 
-      task.due_date && isToday(new Date(task.due_date))
+    const todayTasks = tasks.filter(
+      (task) => task.due_date && isToday(new Date(task.due_date))
     );
 
     return {
@@ -125,7 +142,10 @@ const DashboardPage = () => {
       pending: pendingTasks.length,
       overdue: overdueTasks.length,
       today: todayTasks.length,
-      completionRate: tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0,
+      completionRate:
+        tasks.length > 0
+          ? Math.round((completedTasks.length / tasks.length) * 100)
+          : 0,
     };
   }, [tasks]);
 
@@ -139,26 +159,8 @@ const DashboardPage = () => {
     setEditingTask(null);
   };
 
-  const handleMarkComplete = (task: Task) => {
-    setTaskToComplete(task);
-  };
-
-  const handleConfirmComplete = () => {
-    // This will be handled by the TaskCard's mutation
-    setTaskToComplete(null);
-  };
-
   if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-            <p className="mt-2 text-muted-foreground">Loading your tasks...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (error) {
@@ -168,9 +170,13 @@ const DashboardPage = () => {
           <CardContent className="pt-6">
             <div className="text-center">
               <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Error Loading Tasks</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                Error Loading Tasks
+              </h3>
               <p className="text-muted-foreground mb-4">{error.message}</p>
-              <Button onClick={() => window.location.reload()}>Try Again</Button>
+              <Button onClick={() => window.location.reload()}>
+                Try Again
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -178,8 +184,12 @@ const DashboardPage = () => {
     );
   }
 
-  const pendingTasks = filteredAndSortedTasks.filter(task => !task.is_complete);
-  const completedTasks = filteredAndSortedTasks.filter(task => task.is_complete);
+  const pendingTasks = filteredAndSortedTasks.filter(
+    (task) => !task.is_complete
+  );
+  const completedTasks = filteredAndSortedTasks.filter(
+    (task) => task.is_complete
+  );
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
@@ -206,9 +216,7 @@ const DashboardPage = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
-            <p className="text-xs text-muted-foreground">
-              All tasks
-            </p>
+            <p className="text-xs text-muted-foreground">All tasks</p>
           </CardContent>
         </Card>
 
@@ -218,10 +226,10 @@ const DashboardPage = () => {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.pending}</div>
-            <p className="text-xs text-muted-foreground">
-              In progress
-            </p>
+            <div className="text-2xl font-bold text-blue-600">
+              {stats.pending}
+            </div>
+            <p className="text-xs text-muted-foreground">In progress</p>
           </CardContent>
         </Card>
 
@@ -231,10 +239,10 @@ const DashboardPage = () => {
             <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
-            <p className="text-xs text-muted-foreground">
-              Finished
-            </p>
+            <div className="text-2xl font-bold text-green-600">
+              {stats.completed}
+            </div>
+            <p className="text-xs text-muted-foreground">Finished</p>
           </CardContent>
         </Card>
 
@@ -244,10 +252,10 @@ const DashboardPage = () => {
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.overdue}</div>
-            <p className="text-xs text-muted-foreground">
-              Past due
-            </p>
+            <div className="text-2xl font-bold text-red-600">
+              {stats.overdue}
+            </div>
+            <p className="text-xs text-muted-foreground">Past due</p>
           </CardContent>
         </Card>
 
@@ -258,9 +266,7 @@ const DashboardPage = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.completionRate}%</div>
-            <p className="text-xs text-muted-foreground">
-              Completion
-            </p>
+            <p className="text-xs text-muted-foreground">Completion</p>
           </CardContent>
         </Card>
       </div>
@@ -284,7 +290,10 @@ const DashboardPage = () => {
 
             {/* Filters */}
             <div className="flex flex-wrap gap-2">
-              <Select value={filter} onValueChange={(value: FilterType) => setFilter(value)}>
+              <Select
+                value={filter}
+                onValueChange={(value: FilterType) => setFilter(value)}
+              >
                 <SelectTrigger className="w-[140px]">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue />
@@ -299,7 +308,10 @@ const DashboardPage = () => {
                 </SelectContent>
               </Select>
 
-              <Select value={sortBy} onValueChange={(value: SortType) => setSortBy(value)}>
+              <Select
+                value={sortBy}
+                onValueChange={(value: SortType) => setSortBy(value)}
+              >
                 <SelectTrigger className="w-[140px]">
                   <SortAsc className="h-4 w-4 mr-2" />
                   <SelectValue />
@@ -314,12 +326,17 @@ const DashboardPage = () => {
 
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className={cn(
-                    "w-[140px] justify-start",
-                    !selectedDate && "text-muted-foreground"
-                  )}>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-[140px] justify-start",
+                      !selectedDate && "text-muted-foreground"
+                    )}
+                  >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "MMM dd") : "Pick date"}
+                    {selectedDate
+                      ? format(selectedDate, "MMM dd")
+                      : "Pick date"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -357,20 +374,18 @@ const DashboardPage = () => {
               <Circle className="h-5 w-5 text-blue-500" />
               Pending Tasks
             </h2>
-            <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
+            <Badge
+              variant="secondary"
+              className="bg-blue-50 text-blue-700 border-blue-200"
+            >
               {pendingTasks.length}
             </Badge>
           </div>
-          
+
           <div className="space-y-3">
             {pendingTasks.length > 0 ? (
               pendingTasks.map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  onEdit={handleEditTask}
-                  onMarkComplete={handleMarkComplete}
-                />
+                <TaskCard key={task.id} task={task} onEdit={handleEditTask} />
               ))
             ) : (
               <Card className="border-dashed">
@@ -392,19 +407,18 @@ const DashboardPage = () => {
               <CheckCircle2 className="h-5 w-5 text-green-500" />
               Completed Tasks
             </h2>
-            <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200">
+            <Badge
+              variant="secondary"
+              className="bg-green-50 text-green-700 border-green-200"
+            >
               {completedTasks.length}
             </Badge>
           </div>
-          
+
           <div className="space-y-3">
             {completedTasks.length > 0 ? (
               completedTasks.map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  onEdit={handleEditTask}
-                />
+                <TaskCard key={task.id} task={task} onEdit={handleEditTask} />
               ))
             ) : (
               <Card className="border-dashed">
@@ -429,11 +443,13 @@ const DashboardPage = () => {
             <p className="text-muted-foreground mb-6">
               Try adjusting your search or filter criteria.
             </p>
-            <Button onClick={() => {
-              setSearchQuery("");
-              setFilter("all");
-              setSelectedDate(undefined);
-            }}>
+            <Button
+              onClick={() => {
+                setSearchQuery("");
+                setFilter("all");
+                setSelectedDate(undefined);
+              }}
+            >
               Clear Filters
             </Button>
           </CardContent>
@@ -447,7 +463,8 @@ const DashboardPage = () => {
             <CheckCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No tasks yet</h3>
             <p className="text-muted-foreground mb-6">
-              Create your first task to get started with your productivity journey.
+              Create your first task to get started with your productivity
+              journey.
             </p>
             <Button onClick={() => setIsFormOpen(true)} className="gap-2">
               <Plus className="h-4 w-4" />
@@ -463,19 +480,6 @@ const DashboardPage = () => {
         onClose={handleFormClose}
         task={editingTask}
       />
-
-      {/* Mark Complete Confirmation */}
-      {taskToComplete && (
-        <ConfirmDialog
-          isOpen={!!taskToComplete}
-          onClose={() => setTaskToComplete(null)}
-          onConfirm={handleConfirmComplete}
-          title="Mark Task as Complete"
-          description={`Great job! Mark "${taskToComplete.title}" as completed?`}
-          type="success"
-          confirmText="Mark Complete"
-        />
-      )}
     </div>
   );
 };

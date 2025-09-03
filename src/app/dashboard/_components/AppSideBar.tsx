@@ -31,12 +31,12 @@ const AppSideBar = () => {
     },
     {
       title: "Analytics",
-      url: "/analytics",
+      url: "/dashboard/analytics",
       icon: BarChart3,
     },
     {
       title: "Calendar",
-      url: "#",
+      url: "/dashboard/calendar",
       icon: Calendar,
     },
     {

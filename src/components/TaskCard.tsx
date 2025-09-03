@@ -20,7 +20,6 @@ import { format } from "date-fns";
 interface TaskCardProps {
   task: Task;
   onEdit: (task: Task) => void;
-  onMarkComplete?: (task: Task) => void;
 }
 
 const getPriorityColor = (priority?: number) => {
@@ -49,7 +48,7 @@ const getPriorityText = (priority?: number) => {
   }
 };
 
-export const TaskCard = ({ task, onEdit, onMarkComplete }: TaskCardProps) => {
+export const TaskCard = ({ task, onEdit }: TaskCardProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showCompleteDialog, setShowCompleteDialog] = useState(false);
 
@@ -57,11 +56,7 @@ export const TaskCard = ({ task, onEdit, onMarkComplete }: TaskCardProps) => {
   const toggleTaskMutation = useToggleTaskComplete();
 
   const handleToggleComplete = () => {
-    if (!task.is_complete && onMarkComplete) {
-      onMarkComplete(task);
-    } else {
-      setShowCompleteDialog(true);
-    }
+    setShowCompleteDialog(true);
   };
 
   const confirmToggleComplete = () => {
