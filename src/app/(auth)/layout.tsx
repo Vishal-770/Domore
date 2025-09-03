@@ -21,7 +21,9 @@ export default function AuthLayout({
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (user) {
           router.push("/dashboard");
         }
@@ -81,7 +83,12 @@ export default function AuthLayout({
       >
         {/* Top: Back + Theme Toggle */}
         <div className="flex items-center justify-between">
-          <Button variant="ghost" size="sm" asChild className="text-white">
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="text-primary-foreground hover:bg-primary-foreground/10"
+          >
             <Link href="/">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Home
@@ -93,7 +100,7 @@ export default function AuthLayout({
         {/* Main Content */}
         <div className="flex-1 flex flex-col justify-center mt-8">
           <h1 className="text-4xl font-bold mb-4">Welcome to Domore</h1>
-          <p className="text-lg text-white/80 mb-8">
+          <p className="text-lg text-primary-foreground/90 mb-8">
             The professional task management platform that transforms how you
             organize and accomplish your goals.
           </p>
@@ -102,12 +109,14 @@ export default function AuthLayout({
           <div className="space-y-6">
             {features.map((feature, idx) => (
               <div key={idx} className="flex items-start space-x-4">
-                <div className="bg-white/20 p-2 rounded-lg flex-shrink-0">
-                  <feature.icon className="h-6 w-6 text-white" />
+                <div className="bg-primary-foreground/20 p-2 rounded-lg flex-shrink-0">
+                  <feature.icon className="h-6 w-6 text-primary-foreground" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">{feature.title}</h3>
-                  <p className="text-white/90">{feature.description}</p>
+                  <p className="text-primary-foreground/90">
+                    {feature.description}
+                  </p>
                 </div>
               </div>
             ))}
@@ -115,7 +124,7 @@ export default function AuthLayout({
         </div>
 
         {/* Bottom Branding */}
-        <div className="text-center text-white/70 mt-8">
+        <div className="text-center text-primary-foreground/70 mt-8">
           <p>
             &copy; 2025 Domore. Built for professionals who value excellence.
           </p>
