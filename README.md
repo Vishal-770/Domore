@@ -4,7 +4,9 @@ A modern, feature-rich task management application built with Next.js 15, TypeSc
 
 ![Domore Dashboard](/demoimage.png
 )
-
+![Domore Callender](/demoimage2.png
+)![Domore Analytics](/demoimage3.png
+)
 ## ✨ Features
 
 ### 🎯 Core Task Management
