@@ -1,7 +1,7 @@
-import { LogOut, Settings, User } from "lucide-react";
+"use client";
+import { LogOut } from "lucide-react";
 import Link from "next/link";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { AvatarFallback } from "@radix-ui/react-avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,40 +12,106 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
+import { useEffect, useState } from "react";
+import { User } from "@supabase/supabase-js";
 
 const AppNavBar = () => {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.getUser();
+
+      if (error) {
+        console.error("Error fetching user:", error);
+      } else {
+        setUser(data.user);
+      }
+    };
+
+    getUser();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        router.push("/login");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  // Get user's first letter for fallback
+  const getUserInitial = () => {
+    if (user?.email) {
+      return user.email.charAt(0).toUpperCase();
+    }
+    return "U";
+  };
+
   return (
-    <nav className="flex items-center justify-between p-4">
-      <SidebarTrigger />
-      <div className="flex items-center gap-4 ">
-        <Link href="/">Dashboard</Link>
+    <motion.nav
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="flex items-center justify-between p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+    >
+      <div className="flex items-center gap-3">
+        <SidebarTrigger />
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-2 text-lg font-semibold text-foreground hover:text-primary transition-colors"
+        >
+          Task Dashboard
+        </Link>
+      </div>
+
+      <div className="flex items-center gap-3">
         <ThemeToggle />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Avatar className="cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all">
+                {user?.user_metadata?.avatar_url && (
+                  <AvatarImage
+                    src={user.user_metadata.avatar_url}
+                    alt={user.email || "User avatar"}
+                  />
+                )}
+                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                  {getUserInitial()}
+                </AvatarFallback>
+              </Avatar>
+            </motion.div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent sideOffset={10}>
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>{user?.email || "My Account"}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User className="h-[1.2rem] w-[1.2rem] mr-2" />
-              Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings className="h-[1.2rem] w-[1.2rem] mr-2" />
-              Settings
-            </DropdownMenuItem>
-            <DropdownMenuItem variant="destructive">
-              <LogOut className="h-[1.2rem] w-[1.2rem] mr-2" /> Logout
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="text-destructive focus:text-destructive cursor-pointer"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 

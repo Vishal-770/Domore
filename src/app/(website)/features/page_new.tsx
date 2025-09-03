@@ -1,7 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   CheckCircle,
@@ -144,14 +149,11 @@ export default function FeaturesPage() {
               </span>
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              Domore combines powerful task management features with an intuitive
-              interface, giving you all the tools you need to organize your work
-              and boost your productivity.
+              Domore combines powerful task management features with an
+              intuitive interface, giving you all the tools you need to organize
+              your work and boost your productivity.
             </p>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button size="lg" asChild>
                 <Link href="/register">Start Managing Tasks</Link>
               </Button>
@@ -217,9 +219,12 @@ export default function FeaturesPage() {
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Target className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Focused on Productivity</h3>
+              <h3 className="text-xl font-semibold mb-2">
+                Focused on Productivity
+              </h3>
               <p className="text-muted-foreground">
-                Every feature is designed to help you accomplish more with less effort.
+                Every feature is designed to help you accomplish more with less
+                effort.
               </p>
             </motion.div>
 
@@ -234,7 +239,8 @@ export default function FeaturesPage() {
               </div>
               <h3 className="text-xl font-semibold mb-2">Secure & Private</h3>
               <p className="text-muted-foreground">
-                Your data is protected with enterprise-grade security and encryption.
+                Your data is protected with enterprise-grade security and
+                encryption.
               </p>
             </motion.div>
 
@@ -268,16 +274,22 @@ export default function FeaturesPage() {
               Ready to Transform Your Productivity?
             </h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Join users who have already revolutionized their workflow with Domore&apos;s 
-              comprehensive task management features.
+              Join users who have already revolutionized their workflow with
+              Domore&apos;s comprehensive task management features.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Button size="lg" asChild>
                   <Link href="/register">Get Started Free</Link>
                 </Button>
               </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Button size="lg" variant="outline" asChild>
                   <Link href="/contact">Contact Support</Link>
                 </Button>

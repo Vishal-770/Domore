@@ -1,11 +1,4 @@
-import {
-  Calendar,
-  Search,
-  Settings,
-  User2,
-  BarChart3,
-  CheckSquare,
-} from "lucide-react";
+import { Calendar, User2, BarChart3, CheckSquare } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -39,16 +32,6 @@ const AppSideBar = () => {
       url: "/dashboard/calendar",
       icon: Calendar,
     },
-    {
-      title: "Search",
-      url: "#",
-      icon: Search,
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings,
-    },
   ];
 
   return (
@@ -58,8 +41,8 @@ const AppSideBar = () => {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link href="/">
-                <User2 />
-                <span>My Website</span>
+                <CheckSquare className="h-5 w-5 text-primary" />
+                <span>Do more </span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

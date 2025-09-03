@@ -1,76 +1,167 @@
-import { createClient } from "@/utils/supabase/server";
+"use client";
+
+import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserAvatar } from "@/components/UserAvatar";
-import { MobileNav } from "@/components/MobileNav";
+import { motion, AnimatePresence } from "framer-motion";
+import { User } from "@supabase/supabase-js";
+import { Menu, X, CheckSquare } from "lucide-react"; // Added CheckSquare for logo
 
-const Navbar = async () => {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+const Navbar = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const getUser = async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.getUser();
+
+      if (error) {
+        console.error("Error fetching user:", error.message);
+      } else if (isMounted) {
+        setUser(data.user);
+      }
+      if (isMounted) setIsLoading(false);
+    };
+    getUser();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const navItems = [
+    { href: "/features", label: "Features" },
+    { href: "/contact", label: "Contact" },
+  ];
+
+  if (user) {
+    navItems.unshift({ href: "/dashboard", label: "Dashboard" });
+  }
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+    >
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link
-            href="/"
-            className="text-xl font-bold text-primary hover:text-primary/80 transition-colors"
-          >
-            Domore
-          </Link>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent hover:from-primary/80 hover:to-blue-600/80 transition-all"
+            >
+              <CheckSquare className="h-7 w-7 text-primary" />
+              Domore
+            </Link>
+          </motion.div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop nav items */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link
-              href="/dashboard"
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/features"
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            >
-              Features
-            </Link>
-            <Link
-              href="/contact"
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            >
-              Contact
-            </Link>
+            {navItems.map((item, index) => (
+              <motion.div
+                key={item.href}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Link
+                  href={item.href}
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors relative group"
+                >
+                  {item.label}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+                </Link>
+              </motion.div>
+            ))}
           </div>
 
-          {/* Right side */}
-          <div className="flex items-center space-x-2">
+          {/* Right controls */}
+          <div className="flex items-center space-x-3">
             <ThemeToggle />
-            {user ? <UserAvatar user={user} /> : null}
 
-            {/* Mobile Navigation */}
-            <MobileNav user={user} />
+            {!isLoading && (
+              <>
+                {user ? (
+                  <UserAvatar user={user} />
+                ) : (
+                  <div className="hidden md:flex items-center space-x-2">
+                    <Button variant="ghost" asChild>
+                      <Link href="/login">Sign In</Link>
+                    </Button>
+                    <Button
+                      asChild
+                      className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90"
+                    >
+                      <Link href="/register">Get Started</Link>
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
 
-            {/* Desktop Auth Buttons */}
-            <div className="hidden md:flex items-center space-x-2">
-              {!user && (
-                <>
-                  <Button variant="ghost" asChild>
-                    <Link href="/login">Sign In</Link>
-                  </Button>
-                  <Button asChild>
-                    <Link href="/register">Sign Up</Link>
-                  </Button>
-                </>
-              )}
+            {/* Mobile menu toggle */}
+            <div className="md:hidden">
+              <button onClick={() => setMobileOpen(!mobileOpen)}>
+                {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </nav>
+
+      {/* Mobile nav menu */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="md:hidden border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 overflow-hidden"
+          >
+            <div className="flex flex-col space-y-4 px-4 py-4">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-base font-medium text-muted-foreground hover:text-primary transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+
+              {!isLoading && !user && (
+                <div className="flex flex-col space-y-2 mt-2">
+                  <Button
+                    variant="ghost"
+                    asChild
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <Link href="/login">Sign In</Link>
+                  </Button>
+                  <Button
+                    asChild
+                    className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <Link href="/register">Get Started</Link>
+                  </Button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
   );
 };
 
