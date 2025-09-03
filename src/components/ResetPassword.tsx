@@ -1,52 +1,82 @@
 "use client";
 import React, { useState } from "react";
-import AuthButton from "./AuthButton";
 import { resetPassword } from "@/actions/auth";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const ResetPassword = () => {
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setError(null);
+
     const formData = new FormData(event.currentTarget);
-    const result = await resetPassword(
-      formData,
-      searchParams.get("code") as string
-    );
+    const code = searchParams.get("code");
+
+    if (!code) {
+      const errorMessage = "Invalid or missing reset code";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      setLoading(false);
+      return;
+    }
+
+    const result = await resetPassword(formData, code);
+
     if (result.status === "success") {
-      router.push("/");
+      toast.success(result.message || "Password updated successfully!");
+      router.push("/login");
     } else {
-      setError(result.status);
+      const errorMessage =
+        result.message || result.status || "Failed to reset password";
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
     setLoading(false);
   };
-  return (
-    <div>
-      <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-200">
-            New Password
-          </label>
-          <input
-            type="password"
-            placeholder="Password"
-            id="Password"
-            name="password"
-            className="mt-1 w-full px-4 p-2  h-10 rounded-md border border-gray-200 bg-white text-sm text-gray-700"
-          />
-        </div>
 
-        <div className="mt-4">
-          <AuthButton type="Reset Password" loading={loading} />
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="password">New Password</Label>
+        <Input
+          type="password"
+          placeholder="Enter your new password"
+          id="password"
+          name="password"
+          required
+          disabled={loading}
+          minLength={6}
+        />
+      </div>
+
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Resetting Password...
+          </>
+        ) : (
+          "Reset Password"
+        )}
+      </Button>
+
+      {error && (
+        <div className="flex items-center space-x-2 text-destructive text-sm">
+          <AlertCircle className="h-4 w-4" />
+          <span>{error}</span>
         </div>
-        {error && <p className="text-red-500">{error}</p>}
-      </form>
-    </div>
+      )}
+    </form>
   );
 };
 

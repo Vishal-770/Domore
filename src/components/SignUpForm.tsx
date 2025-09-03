@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const SignUpForm = () => {
   const [error, setError] = useState<string | null>(null);
@@ -18,10 +19,17 @@ const SignUpForm = () => {
     setError(null);
     const formData = new FormData(event.currentTarget);
     const result = await signUp(formData);
+
     if (result.status === "success") {
+      toast.success(
+        result.message ||
+          "Account created successfully! Please check your email to verify your account"
+      );
       router.push("/login");
     } else {
-      setError(result.status || "Sign up failed");
+      const errorMessage = result.message || result.status || "Sign up failed";
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
     setLoading(false);
   };

@@ -12,6 +12,24 @@ export async function signUp(formData: FormData) {
     email: formData.get("email") as string,
     password: formData.get("password") as string,
   };
+
+  // Validate input
+  if (!credentials.email || !credentials.password || !credentials.username) {
+    return {
+      status: "error",
+      message: "All fields are required",
+      user: null,
+    };
+  }
+
+  if (credentials.password.length < 6) {
+    return {
+      status: "error",
+      message: "Password must be at least 6 characters long",
+      user: null,
+    };
+  }
+
   const { error, data } = await supabase.auth.signUp({
     email: credentials.email,
     password: credentials.password,
@@ -23,18 +41,42 @@ export async function signUp(formData: FormData) {
   });
 
   if (error) {
+    // Handle specific error types
+    if (error.message.includes("Invalid email")) {
+      return {
+        status: "error",
+        message: "Please enter a valid email address",
+        user: null,
+      };
+    }
+    if (error.message.includes("Password")) {
+      return {
+        status: "error",
+        message: "Password is too weak. Please use a stronger password",
+        user: null,
+      };
+    }
     return {
-      status: error?.message,
+      status: "error",
+      message: error.message,
       user: null,
     };
   } else if (data?.user?.identities?.length === 0) {
     return {
-      status: "User with this email already exists please login",
+      status: "error",
+      message:
+        "An account with this email already exists. Please sign in instead",
       user: null,
     };
   }
+
   revalidatePath("/", "layout");
-  return { status: "success", user: data.user };
+  return {
+    status: "success",
+    message:
+      "Account created successfully! Please check your email to verify your account",
+    user: data.user,
+  };
 }
 export async function signIn(formData: FormData) {
   const supabase = await createClient();
@@ -42,17 +84,51 @@ export async function signIn(formData: FormData) {
     email: formData.get("email") as string,
     password: formData.get("password") as string,
   };
-  const { error, data } = await supabase.auth.signInWithPassword(credentials);
 
-  if (error) {
+  // Validate input
+  if (!credentials.email || !credentials.password) {
     return {
-      status: error?.message,
+      status: "error",
+      message: "Email and password are required",
       user: null,
     };
   }
 
-  //TODO:create a user instnace in user_profiles table
+  const { error, data } = await supabase.auth.signInWithPassword(credentials);
 
+  if (error) {
+    // Handle specific error types
+    if (error.message.includes("Invalid login credentials")) {
+      return {
+        status: "error",
+        message:
+          "Invalid email or password. Please check your credentials and try again",
+        user: null,
+      };
+    }
+    if (error.message.includes("Email not confirmed")) {
+      return {
+        status: "error",
+        message:
+          "Please check your email and click the confirmation link before signing in",
+        user: null,
+      };
+    }
+    if (error.message.includes("Invalid email")) {
+      return {
+        status: "error",
+        message: "Please enter a valid email address",
+        user: null,
+      };
+    }
+    return {
+      status: "error",
+      message: error.message,
+      user: null,
+    };
+  }
+
+  // Create user profile if it doesn't exist
   const { data: existingUser } = await supabase
     .from("user_profiles")
     .select("*")
@@ -67,23 +143,35 @@ export async function signIn(formData: FormData) {
     });
     if (insertError) {
       return {
-        status: insertError?.message,
+        status: "error",
+        message: "Failed to create user profile. Please try again",
         user: null,
       };
     }
   }
 
   revalidatePath("/", "layout");
-  return { status: "success", user: data.user };
+  return {
+    status: "success",
+    message: "Successfully signed in! Welcome back",
+    user: data.user,
+  };
 }
 
 export async function signOut() {
   const supabase = await createClient();
   const { error } = await supabase.auth.signOut();
+
   if (error) {
+    console.error("Sign out error:", error);
     redirect("/error");
   }
+
+  // Clear all cached data and revalidate
   revalidatePath("/", "layout");
+  revalidatePath("/dashboard", "layout");
+  revalidatePath("/login", "page");
+
   redirect("/login");
 }
 export async function getUserSession() {
@@ -115,34 +203,80 @@ export async function signInWithGithub() {
 export async function forgotPassword(formData: FormData) {
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
-  const { error } = await supabase.auth.resetPasswordForEmail(
-    formData.get("email") as string,
-    {
-      redirectTo: `${origin}/reset-password`,
-    }
-  );
-  if (error) {
+  const email = formData.get("email") as string;
+
+  if (!email) {
     return {
-      status: error?.message,
+      status: "error",
+      message: "Email address is required",
     };
   }
-  return { status: "success" };
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/reset-password`,
+  });
+
+  if (error) {
+    if (error.message.includes("Invalid email")) {
+      return {
+        status: "error",
+        message: "Please enter a valid email address",
+      };
+    }
+    return {
+      status: "error",
+      message: error.message,
+    };
+  }
+
+  return {
+    status: "success",
+    message: "Password reset email sent! Please check your inbox",
+  };
 }
 
 export async function resetPassword(formData: FormData, code: string) {
   const supabase = await createClient();
-  const { error: CodeError } = await supabase.auth.exchangeCodeForSession(code);
+  const password = formData.get("password") as string;
 
-  if (CodeError) {
-    return { status: CodeError?.message };
+  if (!password) {
+    return {
+      status: "error",
+      message: "Password is required",
+    };
   }
+
+  if (password.length < 6) {
+    return {
+      status: "error",
+      message: "Password must be at least 6 characters long",
+    };
+  }
+
+  const { error: codeError } = await supabase.auth.exchangeCodeForSession(code);
+
+  if (codeError) {
+    return {
+      status: "error",
+      message:
+        "Invalid or expired reset link. Please request a new password reset",
+    };
+  }
+
   const { error } = await supabase.auth.updateUser({
-    password: formData.get("password") as string,
+    password: password,
   });
+
   if (error) {
-    return { status: error?.message };
+    return {
+      status: "error",
+      message: error.message,
+    };
   }
+
   return {
     status: "success",
+    message:
+      "Password updated successfully! You can now sign in with your new password",
   };
 }

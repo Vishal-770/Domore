@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
 const AppNavBar = () => {
   const router = useRouter();
@@ -29,7 +30,11 @@ const AppNavBar = () => {
         const { data, error } = await supabase.auth.getUser();
 
         if (error) {
-          console.error("Error fetching user:", error);
+          // Only log significant errors, not session missing errors
+          if (!error.message.includes("Auth session missing")) {
+            console.error("Error fetching user:", error);
+          }
+
           // If it's a refresh token error, redirect to login
           if (
             error.message?.includes("refresh_token_not_found") ||
@@ -42,15 +47,43 @@ const AppNavBar = () => {
           setUser(data.user);
         }
       } catch (error) {
-        console.error("Auth error in AppNavBar:", error);
-        router.push("/login?error=auth_error");
+        console.debug(
+          "Auth error in AppNavBar (expected when not logged in):",
+          error
+        );
+        // Only redirect on serious errors, not missing sessions
+        if (error instanceof Error && !error.message.includes("session")) {
+          router.push("/login?error=auth_error");
+        }
       }
     };
 
     getUser();
+
+    // Set up auth state listener
+    const supabase = createClient();
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        setUser(null);
+        toast.info("You have been signed out");
+        // Force refresh to clear all cached data
+        window.location.href = "/login";
+      } else if (session?.user) {
+        setUser(session.user);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [router]);
+
   const handleLogout = async () => {
     try {
+      toast.loading("Signing out...");
+
       const response = await fetch("/api/auth/logout", {
         method: "POST",
         headers: {
@@ -59,10 +92,25 @@ const AppNavBar = () => {
       });
 
       if (response.ok) {
+        toast.success("Successfully signed out!");
+
+        // Clear user state immediately
+        setUser(null);
+
+        // Navigate to login page
         router.push("/login");
+
+        // Force a page refresh to clear all cached data
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 100);
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || "Failed to sign out");
       }
     } catch (error) {
       console.error("Logout error:", error);
+      toast.error("An error occurred while signing out");
     }
   };
 

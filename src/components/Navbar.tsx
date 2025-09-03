@@ -18,20 +18,41 @@ const Navbar = () => {
   useEffect(() => {
     let isMounted = true;
     const getUser = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.getUser();
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase.auth.getUser();
 
-      if (error) {
-        console.error("Error fetching user:", error.message);
-      } else if (isMounted) {
-        setUser(data.user);
+        if (error) {
+          // Only log non-session errors to avoid spam
+          if (!error.message.includes("Auth session missing")) {
+            console.error("Error fetching user:", error.message);
+          }
+        } else if (isMounted) {
+          setUser(data.user);
+        }
+      } catch (err) {
+        // Silently handle any other errors
+        console.debug("Auth error (expected when not logged in):", err);
+      } finally {
+        if (isMounted) setIsLoading(false);
       }
-      if (isMounted) setIsLoading(false);
     };
+
     getUser();
+
+    // Set up auth state listener
+    const supabase = createClient();
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (isMounted) {
+        setUser(session?.user ?? null);
+      }
+    });
 
     return () => {
       isMounted = false;
+      subscription.unsubscribe();
     };
   }, []);
 

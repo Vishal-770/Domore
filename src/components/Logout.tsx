@@ -1,6 +1,7 @@
 "use client";
 import { signOut } from "@/actions/auth";
 import React, { useState } from "react";
+import { toast } from "sonner";
 
 const Logout = () => {
   const [loading, setLoading] = useState(false);
@@ -8,8 +9,22 @@ const Logout = () => {
   const handleLogout = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
-    await signOut();
-    setLoading(false);
+
+    try {
+      toast.loading("Signing out...");
+      await signOut();
+      toast.success("Successfully signed out!");
+
+      // Force a page refresh to clear all cached data
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 100);
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Failed to sign out");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

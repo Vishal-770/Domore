@@ -12,7 +12,13 @@ export function createClient() {
       console.log("Token refreshed successfully");
     } else if (event === "SIGNED_OUT") {
       console.log("User signed out");
-      // Clear any cached data if needed
+      // Clear local storage and session storage
+      if (typeof window !== "undefined") {
+        localStorage.clear();
+        sessionStorage.clear();
+      }
+    } else if (event === "SIGNED_IN") {
+      console.log("User signed in successfully");
     }
   });
 
