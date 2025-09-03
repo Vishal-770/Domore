@@ -134,10 +134,10 @@ export const TaskFormNew = ({ isOpen, onClose, task }: TaskFormProps) => {
       <Flag
         className={`h-4 w-4 ${
           priority === 3
-            ? "text-red-500"
+            ? "text-destructive"
             : priority === 2
-            ? "text-yellow-500"
-            : "text-green-500"
+            ? "text-warning"
+            : "text-success"
         }`}
       />
     );
@@ -156,7 +156,7 @@ export const TaskFormNew = ({ isOpen, onClose, task }: TaskFormProps) => {
           {/* Title */}
           <div className="space-y-2">
             <Label htmlFor="title" className="text-sm font-medium">
-              Title <span className="text-red-500">*</span>
+              Title <span className="text-destructive">*</span>
             </Label>
             <Input
               id="title"

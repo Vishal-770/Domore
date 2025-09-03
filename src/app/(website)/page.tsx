@@ -57,7 +57,7 @@ export default function LandingPage() {
               variants={fadeInUp}
             >
               Master Your Tasks with{" "}
-              <span className="bg-gradient-to-r from-primary via-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
                 Domore
               </span>
             </motion.h1>
@@ -82,7 +82,7 @@ export default function LandingPage() {
                 <Button
                   size="lg"
                   asChild
-                  className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90"
+                  className="bg-gradient-to-r from-primary to-primary/70 hover:from-primary/90 hover:to-primary/60"
                 >
                   <Link href="/register">
                     Start Managing Tasks

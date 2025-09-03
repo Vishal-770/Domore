@@ -1,32 +1,87 @@
-import { getUserSession } from "@/actions/auth";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle, Zap, Target, Shield } from "lucide-react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
-export default async function AuthLayout({
+export default function AuthLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const response = await getUserSession();
-  if (response?.user) {
-    redirect("/dashboard");
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const supabase = createClient();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          router.push("/dashboard");
+        }
+      } catch (error) {
+        console.error("Error checking user:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkUser();
+  }, [router, supabase.auth]);
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
+
+  const features = [
+    {
+      icon: CheckCircle,
+      title: "Smart Organization",
+      description:
+        "Organize tasks with intelligent categorization and priority management.",
+    },
+    {
+      icon: Zap,
+      title: "Boost Productivity",
+      description:
+        "Advanced features designed to maximize your daily productivity.",
+    },
+    {
+      icon: Target,
+      title: "Goal Achievement",
+      description:
+        "Track progress and achieve your objectives with clear insights.",
+    },
+    {
+      icon: Shield,
+      title: "Secure & Reliable",
+      description: "Your data is protected with enterprise-grade security.",
+    },
+  ];
 
   return (
     <div className="min-h-screen flex">
       {/* Left Column - Information */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-primary text-primary-foreground p-12">
+      <motion.div
+        className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-gradient-to-b from-primary via-primary/90 to-primary/80 text-primary-foreground p-12"
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8 }}
+      >
         {/* Top: Back + Theme Toggle */}
         <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className="text-primary-foreground "
-          >
+          <Button variant="ghost" size="sm" asChild className="text-white">
             <Link href="/">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Home
@@ -37,51 +92,22 @@ export default async function AuthLayout({
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col justify-center mt-8">
-          <h1 className="text-4xl font-bold mb-4 text-primary-foreground">
-            Welcome to Domore
-          </h1>
-          <p className="text-lg text-muted-foreground mb-8">
+          <h1 className="text-4xl font-bold mb-4">Welcome to Domore</h1>
+          <p className="text-lg text-white/80 mb-8">
             The professional task management platform that transforms how you
             organize and accomplish your goals.
           </p>
 
           {/* Features */}
           <div className="space-y-6">
-            {[
-              {
-                icon: CheckCircle,
-                title: "Smart Organization",
-                description:
-                  "Organize tasks with intelligent categorization and priority management.",
-              },
-              {
-                icon: Zap,
-                title: "Boost Productivity",
-                description:
-                  "Advanced features designed to maximize your daily productivity.",
-              },
-              {
-                icon: Target,
-                title: "Goal Achievement",
-                description:
-                  "Track progress and achieve your objectives with clear insights.",
-              },
-              {
-                icon: Shield,
-                title: "Secure & Reliable",
-                description:
-                  "Your data is protected with enterprise-grade security.",
-              },
-            ].map((feature, idx) => (
+            {features.map((feature, idx) => (
               <div key={idx} className="flex items-start space-x-4">
-                <div className="bg-secondary p-2 rounded-lg flex-shrink-0">
-                  <feature.icon className="h-6 w-6 text-secondary-foreground" />
+                <div className="bg-white/20 p-2 rounded-lg flex-shrink-0">
+                  <feature.icon className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg text-primary-foreground">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
+                  <h3 className="font-semibold text-lg">{feature.title}</h3>
+                  <p className="text-white/90">{feature.description}</p>
                 </div>
               </div>
             ))}
@@ -89,12 +115,12 @@ export default async function AuthLayout({
         </div>
 
         {/* Bottom Branding */}
-        <div className="text-center text-muted-foreground mt-8">
+        <div className="text-center text-white/70 mt-8">
           <p>
             &copy; 2025 Domore. Built for professionals who value excellence.
           </p>
         </div>
-      </div>
+      </motion.div>
 
       {/* Right Column - Form */}
       <div className="w-full lg:w-1/2 flex flex-col bg-background text-foreground">

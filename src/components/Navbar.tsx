@@ -54,7 +54,7 @@ const Navbar = () => {
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
               href="/"
-              className="flex items-center gap-2 text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent hover:from-primary/80 hover:to-blue-600/80 transition-all"
+              className="flex items-center gap-2 text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent hover:from-primary/80 hover:to-primary/50 transition-all"
             >
               <CheckSquare className="h-7 w-7 text-primary" />
               Domore
@@ -96,7 +96,7 @@ const Navbar = () => {
                     </Button>
                     <Button
                       asChild
-                      className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90"
+                      className="bg-gradient-to-r from-primary to-primary/70 hover:from-primary/90 hover:to-primary/60"
                     >
                       <Link href="/register">Get Started</Link>
                     </Button>
@@ -147,7 +147,7 @@ const Navbar = () => {
                   </Button>
                   <Button
                     asChild
-                    className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90"
+                    className="bg-gradient-to-r from-primary to-primary/70 hover:from-primary/90 hover:to-primary/60"
                     onClick={() => setMobileOpen(false)}
                   >
                     <Link href="/register">Get Started</Link>

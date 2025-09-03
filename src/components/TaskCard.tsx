@@ -25,13 +25,13 @@ interface TaskCardProps {
 const getPriorityColor = (priority?: number) => {
   switch (priority) {
     case 1:
-      return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800";
+      return "bg-success/10 text-success border-success/20 dark:bg-success/10 dark:text-success dark:border-success/20";
     case 2:
-      return "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800";
+      return "bg-warning/10 text-warning border-warning/20 dark:bg-warning/10 dark:text-warning dark:border-warning/20";
     case 3:
-      return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800";
+      return "bg-destructive/10 text-destructive border-destructive/20 dark:bg-destructive/10 dark:text-destructive dark:border-destructive/20";
     default:
-      return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800";
+      return "bg-muted/50 text-muted-foreground border-border dark:bg-muted/50 dark:text-muted-foreground dark:border-border";
   }
 };
 

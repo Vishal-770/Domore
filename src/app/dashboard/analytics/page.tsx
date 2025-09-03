@@ -56,31 +56,43 @@ const AnalyticsPage = () => {
       {
         name: "High Priority",
         value: tasks.filter((task) => task.priority === 3).length,
-        color: "#ef4444",
+        color: "hsl(var(--destructive))",
       },
       {
         name: "Medium Priority",
         value: tasks.filter((task) => task.priority === 2).length,
-        color: "#f59e0b",
+        color: "hsl(var(--warning))",
       },
       {
         name: "Low Priority",
         value: tasks.filter((task) => task.priority === 1).length,
-        color: "#10b981",
+        color: "hsl(var(--success))",
       },
       {
         name: "No Priority",
         value: tasks.filter((task) => !task.priority || task.priority === 0)
           .length,
-        color: "#6b7280",
+        color: "hsl(var(--muted-foreground))",
       },
     ].filter((item) => item.value > 0);
 
     // Completion status
     const statusData = [
-      { name: "Completed", value: completedTasks.length, color: "#10b981" },
-      { name: "Pending", value: pendingTasks.length, color: "#3b82f6" },
-      { name: "Overdue", value: overdueTasks.length, color: "#ef4444" },
+      {
+        name: "Completed",
+        value: completedTasks.length,
+        color: "hsl(var(--success))",
+      },
+      {
+        name: "Pending",
+        value: pendingTasks.length,
+        color: "hsl(var(--primary))",
+      },
+      {
+        name: "Overdue",
+        value: overdueTasks.length,
+        color: "hsl(var(--destructive))",
+      },
     ].filter((item) => item.value > 0);
 
     // Weekly completion trend (last 7 days) - using updated_at for completed tasks
@@ -241,19 +253,19 @@ const AnalyticsPage = () => {
   const chartConfig = {
     completed: {
       label: "Completed",
-      color: "#10b981",
+      color: "hsl(var(--success))",
     },
     created: {
       label: "Created",
-      color: "#3b82f6",
+      color: "hsl(var(--primary))",
     },
     pending: {
       label: "Pending",
-      color: "#f59e0b",
+      color: "hsl(var(--warning))",
     },
     overdue: {
       label: "Overdue",
-      color: "#ef4444",
+      color: "hsl(var(--destructive))",
     },
   };
 
