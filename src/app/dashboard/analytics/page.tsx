@@ -56,23 +56,23 @@ const AnalyticsPage = () => {
       {
         name: "High Priority",
         value: tasks.filter((task) => task.priority === 3).length,
-        color: "hsl(var(--destructive))",
+        color: "#d13838", // destructive red
       },
       {
         name: "Medium Priority",
         value: tasks.filter((task) => task.priority === 2).length,
-        color: "hsl(var(--warning))",
+        color: "#5dc7ce", // chart-4 (medium teal)
       },
       {
         name: "Low Priority",
         value: tasks.filter((task) => task.priority === 1).length,
-        color: "hsl(var(--success))",
+        color: "#06858e", // chart-1 (primary teal)
       },
       {
         name: "No Priority",
         value: tasks.filter((task) => !task.priority || task.priority === 0)
           .length,
-        color: "hsl(var(--muted-foreground))",
+        color: "#8ad8dd", // chart-5 (light teal)
       },
     ].filter((item) => item.value > 0);
 
@@ -81,17 +81,17 @@ const AnalyticsPage = () => {
       {
         name: "Completed",
         value: completedTasks.length,
-        color: "hsl(var(--success))",
+        color: "#06858e", // chart-1 (primary teal)
       },
       {
         name: "Pending",
         value: pendingTasks.length,
-        color: "hsl(var(--primary))",
+        color: "#1e9ea6", // chart-2 (teal variant)
       },
       {
         name: "Overdue",
         value: overdueTasks.length,
-        color: "hsl(var(--destructive))",
+        color: "#d13838", // destructive
       },
     ].filter((item) => item.value > 0);
 
@@ -253,19 +253,19 @@ const AnalyticsPage = () => {
   const chartConfig = {
     completed: {
       label: "Completed",
-      color: "hsl(var(--success))",
+      color: "#06858e", // chart-1 (primary teal)
     },
     created: {
       label: "Created",
-      color: "hsl(var(--primary))",
+      color: "#1e9ea6", // chart-2 (teal variant)
     },
     pending: {
       label: "Pending",
-      color: "hsl(var(--warning))",
+      color: "#37b6be", // chart-3 (light teal)
     },
     overdue: {
       label: "Overdue",
-      color: "hsl(var(--destructive))",
+      color: "#d13838", // destructive red
     },
   };
 
