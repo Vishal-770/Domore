@@ -1,4 +1,11 @@
-import { Calendar, Home, Inbox, Search, Settings, User2 } from "lucide-react";
+import {
+  Calendar,
+  Search,
+  Settings,
+  User2,
+  BarChart3,
+  CheckSquare,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -18,14 +25,14 @@ import Link from "next/link";
 const AppSideBar = () => {
   const items = [
     {
-      title: "Home",
-      url: "#",
-      icon: Home,
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: CheckSquare,
     },
     {
-      title: "Inbox",
-      url: "#",
-      icon: Inbox,
+      title: "Analytics",
+      url: "/analytics",
+      icon: BarChart3,
     },
     {
       title: "Calendar",
