@@ -2,7 +2,8 @@
 
 A modern, feature-rich task management application built with Next.js 15, TypeScript, and Supabase. Domore helps you organize, prioritize, and track your tasks with powerful analytics and an intuitive user interface.
 
-![Domore Dashboard](https://via.placeholder.com/800x400/6366f1/ffffff?text=Domore+Dashboard)
+![Domore Dashboard](<img width="1905" height="921" alt="image" src="https://github.com/user-attachments/assets/ac7560ce-1675-4119-8161-9eec3cd2a0ff" />
+)
 
 ## ✨ Features
 
