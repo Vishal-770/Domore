@@ -24,19 +24,31 @@ const AppNavBar = () => {
 
   useEffect(() => {
     const getUser = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.getUser();
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase.auth.getUser();
 
-      if (error) {
-        console.error("Error fetching user:", error);
-      } else {
-        setUser(data.user);
+        if (error) {
+          console.error("Error fetching user:", error);
+          // If it's a refresh token error, redirect to login
+          if (
+            error.message?.includes("refresh_token_not_found") ||
+            error.message?.includes("Invalid Refresh Token")
+          ) {
+            router.push("/login?error=session_expired");
+            return;
+          }
+        } else {
+          setUser(data.user);
+        }
+      } catch (error) {
+        console.error("Auth error in AppNavBar:", error);
+        router.push("/login?error=auth_error");
       }
     };
 
     getUser();
-  }, []);
-
+  }, [router]);
   const handleLogout = async () => {
     try {
       const response = await fetch("/api/auth/logout", {

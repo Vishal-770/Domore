@@ -34,10 +34,30 @@ export async function updateSession(request: NextRequest) {
   // issues with users being randomly logged out.
 
   // IMPORTANT: DO NOT REMOVE auth.getUser()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Wrap getUser in try-catch to handle refresh token errors gracefully
+  let user = null;
+  try {
+    const {
+      data: { user: userData },
+    } = await supabase.auth.getUser();
+    user = userData;
+  } catch (error: unknown) {
+    const authError = error as {
+      message?: string;
+      code?: string;
+      status?: number;
+    };
+    console.warn("Auth error in middleware:", authError.message);
+    // If it's a refresh token error, clear the session
+    if (
+      authError.code === "refresh_token_not_found" ||
+      authError.status === 400
+    ) {
+      // Clear auth cookies by setting them to expire
+      supabaseResponse.cookies.set("sb-access-token", "", { maxAge: 0 });
+      supabaseResponse.cookies.set("sb-refresh-token", "", { maxAge: 0 });
+    }
+  }
 
   // Define public routes that don't require authentication
   const publicRoutes = [

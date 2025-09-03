@@ -38,11 +38,8 @@ const Navbar = () => {
   const navItems = [
     { href: "/features", label: "Features" },
     { href: "/contact", label: "Contact" },
+    { href: "/dashboard", label: "Dashboard" },
   ];
-
-  if (user) {
-    navItems.unshift({ href: "/dashboard", label: "Dashboard" });
-  }
 
   return (
     <motion.nav
