@@ -1,13 +1,13 @@
 "use client";
 import React, { useState } from "react";
-import { signUp } from "@/actions/auth";
+import { signIn } from "@/actions/auth";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, Loader2 } from "lucide-react";
 
-const SignUpForm = () => {
+const ActualLoginForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
@@ -16,30 +16,20 @@ const SignUpForm = () => {
     event.preventDefault();
     setLoading(true);
     setError(null);
+
     const formData = new FormData(event.currentTarget);
-    const result = await signUp(formData);
+    const result = await signIn(formData);
+
     if (result.status === "success") {
-      router.push("/login");
+      router.push("/dashboard");
     } else {
-      setError(result.status || "Sign up failed");
+      setError(result.status || "Login failed");
     }
     setLoading(false);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="username">Username</Label>
-        <Input
-          type="text"
-          placeholder="Enter your username"
-          id="username"
-          name="username"
-          required
-          disabled={loading}
-        />
-      </div>
-
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input
@@ -56,7 +46,7 @@ const SignUpForm = () => {
         <Label htmlFor="password">Password</Label>
         <Input
           type="password"
-          placeholder="Create a password"
+          placeholder="Enter your password"
           name="password"
           id="password"
           required
@@ -68,10 +58,10 @@ const SignUpForm = () => {
         {loading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Creating account...
+            Signing in...
           </>
         ) : (
-          "Create account"
+          "Sign In"
         )}
       </Button>
 
@@ -85,4 +75,4 @@ const SignUpForm = () => {
   );
 };
 
-export default SignUpForm;
+export default ActualLoginForm;

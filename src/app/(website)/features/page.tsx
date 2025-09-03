@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -102,7 +103,7 @@ export default function FeaturesPage() {
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
       <section className="py-20 px-4 bg-gradient-to-b from-background to-muted/20">
-        <div className="container max-w-6xl text-center">
+        <div className="mx-auto max-w-6xl text-center">
           <Badge variant="secondary" className="mb-6">
             Comprehensive Features
           </Badge>
@@ -123,19 +124,21 @@ export default function FeaturesPage() {
 
       {/* Features Grid */}
       <section className="py-20 px-4">
-        <div className="container max-w-6xl">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <Card
                 key={index}
-                className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group"
+                className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 group rounded-lg"
               >
-                <CardHeader>
-                  <div className="mb-4 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                <CardHeader className="space-y-3">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                     <feature.icon className="h-6 w-6 text-primary" />
                   </div>
-                  <CardTitle className="text-lg">{feature.title}</CardTitle>
-                  <CardDescription className="text-base">
+                  <CardTitle className="text-lg font-semibold">
+                    {feature.title}
+                  </CardTitle>
+                  <CardDescription className="text-sm text-muted-foreground">
                     {feature.description}
                   </CardDescription>
                 </CardHeader>
@@ -147,7 +150,7 @@ export default function FeaturesPage() {
 
       {/* CTA Section */}
       <section className="py-20 px-4 bg-muted/30">
-        <div className="container max-w-4xl text-center">
+        <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Transform Your Productivity?
           </h2>
